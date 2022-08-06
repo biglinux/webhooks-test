@@ -26,4 +26,4 @@ jobs:
       - name: echo
         shell: bash
         run: |
-          curl -X POST -H "Accept: application/json" -H "Authorization: token ${{ secrets.WEBHOOK_TOKEN_TEST }}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" --data '{"event_type": "makepkg", "client_payload": { "version": "1.2.3"}}'   https://api.github.com/repos/gitbigbarna/ac-test/dispatches
+          curl -X POST -H "Accept: application/json" -H "Authorization: token ${{ secrets.WEBHOOK_TOKEN_TEST }}" --data '{"event_type": "makepkg", "client_payload": { "version": "1.2.3"}}'   https://api.github.com/repos/gitbigbarna/ac-test/dispatches
