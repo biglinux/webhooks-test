@@ -1,0 +1,26 @@
+name: "Hit a webhook"
+on:
+  push:
+    tags:
+      - '**'
+      
+  #workflow_dispatch:
+  #  types:
+  #    - webhook
+  #    - '**'
+  
+  repository_dispatch:
+    types:
+      - webhook
+      - '**'
+      
+jobs:
+  run-updater:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: echo
+        shell: bash
+        run: |
+          curl -X POST -H "Accept: application/json" -H "Authorization: token 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" --data '{"event_type": "makepkg", "client_payload": { "version": "1.2.3"}}'   https://api.github.com/repos/gitbigbarna/ac-test/dispatches
