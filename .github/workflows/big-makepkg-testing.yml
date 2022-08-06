@@ -1,0 +1,61 @@
+name: Big-Makepkg-Testing
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  #push:
+  #  branches: [ "master", "main" ]
+  #pull_request:
+  #  branches: [ "master", "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      #- name: Makepkg Build and Check
+      #  id: makepkg
+      #  # You may pin to the exact commit or the version.
+      #  # uses: edlanglois/pkgbuild-action@5bb737e69e6a5a171327e6bcf8adace04814685c
+      #  uses: BarnabediKartola/manjaro-pkg-action@main
+      #  with:
+      #    package: pkgbuild
+      #    branch: stable
+      #    gpg-key: ${{ secrets.GPG_PRIVATE_KEY }}
+      #    gpg-passphrase: ${{ secrets.PASSPHRASE }}
+    
+      - name: Update pkgrel
+        run: |
+          git add pkgbuild/PKGBUILD
+          pkgrelorg=$(grep pkgrel pkgbuild/PKGBUILD | cut -d "=" -f2)
+          pkgrelnew=$(($pkgrelorg+1))
+          sed -i "/pkgrel=/s/=.*/=$pkgrelnew/" pkgbuild/PKGBUILD
+          
+      - name: Commit files
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "pkgrel+1" -a
+          echo $PWD
+          
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          
+      #- name: Hooks
+      #  shell: bash
+      #  run: |
+      #    curl -X POST -H "Accept: application/json" -H "Authorization: token ${{ secrets.WEBHOOK_TOKEN }}" --data '{"event_type": "build", "client_payload": { "url": "https://github.com/BarnabediKartola/rustdesk-bin", "version": "1.2.3"}}' https://api.github.com/repos/gitbigbarna/pkgbuild/dispatches
+      
